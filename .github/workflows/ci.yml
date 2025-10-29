@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: |
+          pip install ragas datasets evaluate rouge-score pytest langchain-community requests tqdm
+      - name: Run evaluation
+        env:
+          LM_STUDIO_BASE: http://localhost:1234/v1
+          LM_STUDIO_MODEL: mistral-7b-instruct-v0.3
+        run: |
+          python scripts/run_eval.py
+      - name: Run tests
+        run: |
+          pytest -q
